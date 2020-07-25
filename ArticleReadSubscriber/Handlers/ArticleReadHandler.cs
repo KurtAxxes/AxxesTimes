@@ -26,7 +26,7 @@ namespace ArticleReadSubscriber.Handlers
             log.Info($"Received message for article {articleId}.");
             
             // generate system error, always happening
-            throw new Exception("BOOM");
+            //throw new Exception("BOOM");
 
             _articleRepository.UpdateArticleRead(articleId);
 

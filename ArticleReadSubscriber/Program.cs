@@ -48,8 +48,16 @@ namespace ArticleReadSubscriber
                         },
                         dependencyLifecycle: DependencyLifecycle.InstancePerUnitOfWork);
                 });
-            endpointConfiguration.SendFailedMessagesTo("ArticleReadSubscriber.Errors");
+            endpointConfiguration.SendFailedMessagesTo("error");
+            endpointConfiguration.AuditProcessedMessagesTo("audit");
             endpointConfiguration.EnableInstallers();
+
+            var metrics = endpointConfiguration.EnableMetrics();
+
+            metrics.SendMetricDataToServiceControl(
+                serviceControlMetricsAddress: "Particular.Monitoring",
+                interval: TimeSpan.FromSeconds(2)
+            );
 
             var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
             transport.ConnectionString("host=localhost");

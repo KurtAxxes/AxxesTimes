@@ -21,8 +21,16 @@ namespace ReadArticleMailer.Handlers
         {
             var articleId = message.ArticleId;
 
-            // obviously you would do something cool here
-            log.Info($"Sending out an email because article [{articleId}] was read!");
+            var article = _articleRepository.GetArticleById(articleId);
+            if (article.Reads % 5 == 0)
+            {
+                // do something useful here
+                log.Info($"Article {article.Id} reached a new milestone and has now {article.Reads} reads.");
+            }
+            else
+            {
+                log.Info($"No new milestone yet for article {article.Id}.");
+            }
 
             return Task.CompletedTask;
         }

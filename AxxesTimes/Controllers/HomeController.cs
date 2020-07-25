@@ -72,10 +72,8 @@ namespace AxxesTimes.Controllers
         private async Task NotifyArticleReadAsync(int articleId)
         {
             var endpointConfiguration = new EndpointConfiguration("AxxesTimesSite"); // the initiator of the command
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
-            //var routing = transport.Routing();
-            //routing.RouteToEndpoint(typeof(ReadArticle), "ReadArticleSubscriber"); // the command type and receiver of the command
-
+            endpointConfiguration.UseTransport<LearningTransport>();
+            
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                                                  .ConfigureAwait(false);
 

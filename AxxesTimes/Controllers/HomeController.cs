@@ -5,6 +5,8 @@ using AxxesTimes.Models;
 using AxxesTimes.Data;
 using System.Threading.Tasks;
 using System.Linq;
+using NServiceBus;
+using AxxesTimes.Commands;
 
 namespace AxxesTimes.Controllers
 {
@@ -51,8 +53,8 @@ namespace AxxesTimes.Controllers
             article.Reads++;
 
             // update current reads for article in the database
-            UpdateArticleRead(article.Id);
-            
+            await NotifyArticleReadAsync(article.Id);
+
             return View(article);
         }
 
@@ -68,14 +70,25 @@ namespace AxxesTimes.Controllers
         }
 
 
-        /*
-         * THIS APPROACH IS A BAD IDEA BECAUSE IT'S A DIRECT DEPENDENCY ON THE DATABASE
-         * AND CAN POTENTIALLY HAVE A HUGE PERFORMANCE IMPACT.
-         * IT IS BETTER TO USE MESSAGE QUEUES INSTEAD.
-         */
-        private void UpdateArticleRead(int articleId)
+        private async Task NotifyArticleReadAsync(int articleId)
         {
-            _articlesRepository.UpdateArticleRead(articleId);
+            var endpointConfiguration = new EndpointConfiguration("AxxesTimesSite"); // the initiator of the command
+            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            var routing = transport.Routing();
+            routing.RouteToEndpoint(typeof(ReadArticle), "ReadArticleSubscriber"); // the command type and receiver of the command
+
+            var endpointInstance = await Endpoint.Start(endpointConfiguration)
+                                                 .ConfigureAwait(false);
+
+            var command = new ReadArticle()
+            {
+                ArticleId = articleId
+            };
+
+            await endpointInstance.Send(command).ConfigureAwait(false);
+
+            await endpointInstance.Stop()
+                                  .ConfigureAwait(false);
         }
     }
 }

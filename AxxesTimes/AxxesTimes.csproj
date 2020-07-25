@@ -11,6 +11,12 @@
 
 
   <ItemGroup>
+    <PackageReference Include="NServiceBus" Version="7.3.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\AxxesTimes.Commands\AxxesTimes.Commands.csproj" />
     <ProjectReference Include="..\AxxesTimes.Data\AxxesTimes.Data.csproj" />
   </ItemGroup>
 

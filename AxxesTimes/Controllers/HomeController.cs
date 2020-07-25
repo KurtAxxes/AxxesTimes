@@ -6,7 +6,7 @@ using AxxesTimes.Data;
 using System.Threading.Tasks;
 using System.Linq;
 using NServiceBus;
-using AxxesTimes.Commands;
+using AxxesTimes.Events;
 
 namespace AxxesTimes.Controllers
 {
@@ -16,7 +16,7 @@ namespace AxxesTimes.Controllers
 
         private readonly ILogger<HomeController> _logger;
         private readonly IArticlesRepository _articlesRepository;
-
+        
         public HomeController(ILogger<HomeController> logger, IArticlesRepository articlesRepository)
         {
             _logger = logger;
@@ -69,25 +69,22 @@ namespace AxxesTimes.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
         private async Task NotifyArticleReadAsync(int articleId)
         {
             var endpointConfiguration = new EndpointConfiguration("AxxesTimesSite"); // the initiator of the command
             var transport = endpointConfiguration.UseTransport<LearningTransport>();
-            var routing = transport.Routing();
-            routing.RouteToEndpoint(typeof(ReadArticle), "ReadArticleSubscriber"); // the command type and receiver of the command
+            //var routing = transport.Routing();
+            //routing.RouteToEndpoint(typeof(ReadArticle), "ReadArticleSubscriber"); // the command type and receiver of the command
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                                                  .ConfigureAwait(false);
 
-            var command = new ReadArticle()
+            var articleReadEvent = new ArticleRead
             {
                 ArticleId = articleId
             };
 
-            await endpointInstance.Send(command).ConfigureAwait(false);
-
-            await endpointInstance.Stop()
+            await endpointInstance.Publish(articleReadEvent)
                                   .ConfigureAwait(false);
         }
     }

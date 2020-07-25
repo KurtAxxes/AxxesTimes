@@ -1,23 +1,23 @@
-﻿using AxxesTimes.Commands;
-using AxxesTimes.Data;
+﻿using AxxesTimes.Data;
+using AxxesTimes.Events;
 using NServiceBus;
 using NServiceBus.Logging;
 using System.Threading.Tasks;
 
-namespace ReadArticleSubscriber.Handlers
+namespace ArticleReadSubscriber.Handlers
 {
-    class ReadArticleHandler : IHandleMessages<ReadArticle>
+    class ArticleReadHandler : IHandleMessages<ArticleRead>
     {
-        static readonly ILog log = LogManager.GetLogger<ReadArticleHandler>();
+        static readonly ILog log = LogManager.GetLogger<ArticleReadHandler>();
 
         private readonly IArticlesRepository _articleRepository;
 
-        public ReadArticleHandler(IArticlesRepository articleRepository)
+        public ArticleReadHandler(IArticlesRepository articleRepository)
         {
             _articleRepository = articleRepository;
         }
 
-        public Task Handle(ReadArticle message, IMessageHandlerContext context)
+        public Task Handle(ArticleRead message, IMessageHandlerContext context)
         {
             var articleId = message.ArticleId;
 

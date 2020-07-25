@@ -1,8 +1,8 @@
 ﻿using NServiceBus;
 
-namespace AxxesTimes.Commands
+namespace AxxesTimes.Events
 {
-    public class ReadArticle : ICommand
+    public class ArticleRead : IEvent
     {
         public int ArticleId { get; set; }
     }

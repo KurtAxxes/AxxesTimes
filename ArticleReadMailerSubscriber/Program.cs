@@ -48,7 +48,12 @@ namespace ArticleReadMailerSubscriber
                         },
                         dependencyLifecycle: DependencyLifecycle.InstancePerUnitOfWork);
                 });
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            endpointConfiguration.SendFailedMessagesTo("ArticleReadMailerSubscriber.Errors");
+            endpointConfiguration.EnableInstallers();
+
+            var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
+            transport.ConnectionString("host=localhost");
+            transport.UseDirectRoutingTopology();
 
             // start listening for incoming messages
             var endpointInstance = await Endpoint.Start(endpointConfiguration)

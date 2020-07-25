@@ -71,9 +71,13 @@ namespace AxxesTimes.Controllers
 
         private async Task NotifyArticleReadAsync(int articleId)
         {
-            var endpointConfiguration = new EndpointConfiguration("AxxesTimesSite"); // the initiator of the command
-            endpointConfiguration.UseTransport<LearningTransport>();
-            
+            var endpointConfiguration = new EndpointConfiguration("AxxesTimesSite");
+            endpointConfiguration.EnableInstallers();
+
+            var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
+            transport.ConnectionString("host=localhost");
+            transport.UseDirectRoutingTopology();
+
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                                                  .ConfigureAwait(false);
 
